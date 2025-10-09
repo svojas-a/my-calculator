@@ -1,6 +1,11 @@
-************* Module src.calculator
-src/calculator.py:59:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.cli
+src/cli.py:42:0: C0304: Final newline missing (missing-final-newline)
+src/cli.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/cli.py:3:0: E0401: Unable to import 'calculator' (import-error)
+src/cli.py:37:11: W0718: Catching too general exception Exception (broad-exception-caught)
+src/cli.py:42:4: E1120: No value for argument 'operation' in function call (no-value-for-parameter)
+src/cli.py:42:4: E1120: No value for argument 'num1' in function call (no-value-for-parameter)
 
 ------------------------------------------------------------------
-Your code has been rated at 9.69/10 (previous run: 9.69/10, +0.00)
+Your code has been rated at 7.10/10 (previous run: 7.10/10, +0.00)
 
