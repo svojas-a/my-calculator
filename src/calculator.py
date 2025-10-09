@@ -34,7 +34,7 @@ def power(a, b):
     """Raise a to the power of b"""
     if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
         raise TypeError("Power requires numeric inputs")
-    return a ** b
+    return a**b
 
 
 def square_root(a):
@@ -43,7 +43,7 @@ def square_root(a):
         raise TypeError("Square root requires a numeric input")
     if a < 0:
         raise ValueError("Cannot calculate square root of negative number")
-    return a ** 0.5
+    return a**0.5
 
 
 if __name__ == "__main__":
