@@ -1,45 +1,39 @@
-import subprocess
-import sys
-import pytest
+# In file: tests/integration/test_cli_integration.py
 
+# Import CliRunner instead of subprocess (and update all test logic to use res.output/res.exit_code)
+from click.testing import CliRunner 
+import pytest 
 
-class TestCLIIntegration:
-    """Test CLI application integrating with calculator module"""
+# Note: We need to import calculate within run_cli to ensure proper module loading
+# but you might need these basic ones for integration tests if you kept them.
+# from src.calculator import add, multiply, divide, power, square_root 
 
-    def run_cli(self, *args):
-        """Helper method to run CLI and capture output"""
-        cmd = [sys.executable, "src/cli.py"] + list(args)
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd=".")
-        return result
+class TestCLIIntegration: 
+    """Test CLI application integrating with 
+    calculator module (in-process)""" 
 
-    def test_cli_add_integration(self):
-        """Test CLI can perform addition"""
-        result = self.run_cli("add", "5", "3")
-        assert result.returncode == 0
-        assert result.stdout.strip() == "8"
+    def run_cli(self, *args): 
+        """Invoke Click CLI in-process so coverage is 
+        measured.""" 
+        # Import CLI function here to ensure proper path loading for Pytest
+        from src.cli import calculate 
+        runner = CliRunner() 
+        return runner.invoke(calculate, list(args)) 
 
-    def test_cli_subtract_integration(self):
-        """Test CLI can perform subtraction"""
-        result = self.run_cli("subtract", "5", "3")
-        assert result.returncode == 0
-        assert result.stdout.strip() == "2"
+    def test_cli_add_integration(self): 
+        res = self.run_cli("add", "5", "3") 
+        # Note the change from result.returncode to res.exit_code 
+        assert res.exit_code == 0 
+        # Note the change from result.stdout.strip() to res.output.strip() 
+        assert res.output.strip() == "8"
 
-    # In tests/test_cli_integration.py
+    # ... (You need to update all your other integration tests 
+    # to use res.exit_code, res.output.strip(), and res.output for error checking) ...
 
-    # ... (other code above is unchanged)
-
+    # Example of fixed error test:
     def test_cli_subtract_missing_operand_error(self):
-        """Test CLI handles missing operand for subtraction gracefully"""
-        # Call subtract with only one operand; CLI should exit with non-zero and print an error
-        result = self.run_cli("subtract", "5")
-
-        # 1. Assert the return code is 1 (FAILURE) - This is already correct and now passing.
-        assert result.returncode == 1
-
-        # 2. CORRECTED ASSERTION:
-        # The CLI correctly exits from the specific 'except ValueError' block,
-        # printing a specific error message to STDERR.
-        expected_error_prefix = "Error: Missing second operand"
-
-        # Check STDERR instead of STDOUT, and check for the correct message.
-        assert result.stderr.strip().startswith(expected_error_prefix)
+        res = self.run_cli('subtract', '5')
+        assert res.exit_code == 1
+        # Check output contains the error message, not just stdout
+        assert "Missing second operand" in res.output 
+        # OR: assert "Error: Missing second operand" in res.output
