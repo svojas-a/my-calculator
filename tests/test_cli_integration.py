@@ -24,10 +24,22 @@ class TestCLIIntegration:
         assert result.returncode == 0
         assert result.stdout.strip() == "2"
 
+    # In tests/test_cli_integration.py
+
+    # ... (other code above is unchanged)
+
     def test_cli_subtract_missing_operand_error(self):
         """Test CLI handles missing operand for subtraction gracefully"""
         # Call subtract with only one operand; CLI should exit with non-zero and print an error
         result = self.run_cli("subtract", "5")
+
+        # 1. Assert the return code is 1 (FAILURE) - This is already correct and now passing.
         assert result.returncode == 1
-        # CLI prints a generic unexpected error message for this case
-        assert result.stdout.strip().startswith("Unexpected error:")
+
+        # 2. CORRECTED ASSERTION:
+        # The CLI correctly exits from the specific 'except ValueError' block,
+        # printing a specific error message to STDERR.
+        expected_error_prefix = "Error: Missing second operand"
+
+        # Check STDERR instead of STDOUT, and check for the correct message.
+        assert result.stderr.strip().startswith(expected_error_prefix)

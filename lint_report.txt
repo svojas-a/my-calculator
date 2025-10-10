@@ -1,11 +1,12 @@
 ************* Module src.cli
-src/cli.py:42:0: C0304: Final newline missing (missing-final-newline)
-src/cli.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/cli.py:3:0: E0401: Unable to import 'calculator' (import-error)
-src/cli.py:37:11: W0718: Catching too general exception Exception (broad-exception-caught)
-src/cli.py:42:4: E1120: No value for argument 'operation' in function call (no-value-for-parameter)
-src/cli.py:42:4: E1120: No value for argument 'num1' in function call (no-value-for-parameter)
+src/cli.py:38:0: W0311: Bad indentation. Found 17 spaces, expected 16 (bad-indentation)
+src/cli.py:62:0: C0304: Final newline missing (missing-final-newline)
+src/cli.py:11:0: C0413: Import "from src.calculator import add, subtract, multiply, divide, power, square_root" should be placed at the top of the module (wrong-import-position)
+src/cli.py:57:11: W0718: Catching too general exception Exception (broad-exception-caught)
+src/cli.py:18:0: R0912: Too many branches (13/12) (too-many-branches)
+src/cli.py:62:4: E1120: No value for argument 'operation' in function call (no-value-for-parameter)
+src/cli.py:62:4: E1120: No value for argument 'num1' in function call (no-value-for-parameter)
 
 ------------------------------------------------------------------
-Your code has been rated at 7.10/10 (previous run: 7.10/10, +0.00)
+Your code has been rated at 7.79/10 (previous run: 7.79/10, +0.00)
 
