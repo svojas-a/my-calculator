@@ -1,15 +1,21 @@
 """CLI interface for calculator operations."""
 
+# In file: src/cli.py
+
+"""CLI interface for calculator operations."""
+
 import sys
 import os
 import click
 
-# Ensure the project root is on sys.path (for pytest & direct runs)
-# This line is often necessary for tests/cli to find src/calculator
+# 💥 CRITICAL FIX: Ensure the project root is on sys.path 
+# This helps pytest/CliRunner resolve imports like 'from src.calculator import...'
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.calculator import add, subtract, multiply, divide, power, square_root
+# Import the calculator functions
+from src.calculator import add, subtract, multiply, divide, power, square_root 
 
+# ... the rest of your calculate function (@click.command, etc.) ...
 
 @click.command()
 @click.argument("operation")
