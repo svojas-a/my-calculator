@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Note: Changed from @v3 to @v4 for consistency
+        uses: actions/checkout@v4
       
       - name: Set up Python 3.13
         uses: actions/setup-python@v4
@@ -52,16 +52,22 @@ jobs:
           pip install -r requirements.txt
           
       - name: Unit Tests with Coverage
+        # CRITICAL FIX: Set PYTHONPATH to the project root for imports (src.cli, src.calculator)
+        env:
+          PYTHONPATH: .
         run: |
           echo "🧪 Running unit tests..."
-          # Fix: Use python -m pytest and correct path/coverage flags
+          # FIX: Use python -m pytest
           python -m pytest tests/unit/ -v --cov=src --cov-report=term --cov-report=xml
           
       - name: Integration Tests
+        # CRITICAL FIX: Set PYTHONPATH
+        env:
+          PYTHONPATH: .
         run: |
           echo "⚙️ Running integration tests..."
-          # Fix: Use python -m pytest 
-          python -m pytest tests/integration/ -v --tb=short
+          # FIX: Use python -m pytest and target the file explicitly
+          python -m pytest tests/test_cli_integration.py -v --tb=short
 
   # Coverage stage: run coverage and upload HTML report
   coverage:
@@ -82,9 +88,12 @@ jobs:
           pip install -r requirements.txt
           
       - name: Run tests with coverage and generate HTML report
+        # CRITICAL FIX: Set PYTHONPATH
+        env:
+          PYTHONPATH: .
         run: |
           echo "📈 Checking test coverage..."
-          # Fix: Use python -m pytest
+          # FIX: Use python -m pytest
           python -m pytest tests/ --cov=src --cov-fail-under=80 --cov-report=term-missing --cov-report=html
           
       - name: Upload coverage HTML
@@ -93,7 +102,7 @@ jobs:
           name: coverage-html
           path: htmlcov
 
-  # repository quality (lint) stage
+  # Code quality (lint) stage
   lint:
     runs-on: ubuntu-latest
     needs: coverage
@@ -112,9 +121,11 @@ jobs:
           pip install pylint
           
       - name: Run pylint and save report
+        env:
+          PYTHONPATH: . # Ensure pylint can resolve src.calculator
         run: |
           echo "📝 Running pylint..."
-          # Fix: Use python -m pylint
+          # FIX: Use python -m pylint
           python -m pylint src/ --output-format=text > lint_report.txt || true
           echo "Saved lint report to lint_report.txt"
           # enforce threshold (set to 7.0 here; change to 8.0 if you prefer stricter)
@@ -154,7 +165,7 @@ jobs:
       - name: Check formatting with black (apply if fails)
         run: |
           echo "🎨 Checking formatting with black..."
-          # Fix: Use python -m black
+          # FIX: Use python -m black
           if ! python -m black src/ tests/ --check; then
             echo "Black formatting failed; applying fixes..."
             python -m black src/ tests/
@@ -186,13 +197,13 @@ jobs:
       - name: Run bandit (console)
         run: |
           echo "🔒 Running bandit security scan..."
-          # Fix: Use python -m bandit
+          # FIX: Use python -m bandit
           python -m bandit -r src/ -v || true
           
       - name: Run bandit (json output)
         run: |
           rm -f security_report.json || true
-          # Fix: Use python -m bandit
+          # FIX: Use python -m bandit
           python -m bandit -r src/ -f json -o security_report.json || true
           
       - name: Upload security report
@@ -209,6 +220,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+          
+      - name: Install Zip Utility
+        # Install the zip utility needed for packaging
+        run: sudo apt-get update && sudo apt-get install -y zip unzip
+
       - name: Download coverage artifact (if present)
         uses: actions/download-artifact@v4
         with:
