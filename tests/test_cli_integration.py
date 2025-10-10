@@ -1,18 +1,20 @@
 """
 Integration Tests - CLI + Calculator Working Together (Using CliRunner for CI compatibility)
 """
-# CRITICAL FIX: Import CliRunner for in-process testing
 from click.testing import CliRunner 
 import pytest 
+import subprocess # Kept for older structure reference, but CliRunner is preferred.
+import sys # Kept for older structure reference.
 
 class TestCLIIntegration: 
     """Test CLI application integrating with calculator module (in-process)""" 
 
     def run_cli(self, *args): 
         """Invoke Click CLI in-process so coverage is measured and path issues are avoided.""" 
-        # Import CLI function here to ensure proper path loading when Pytest imports the module
+        # Import CLI function inside the helper for robust module loading
         from src.cli import calculate 
         runner = CliRunner() 
+        # CliRunner returns a Result object with .exit_code and .output
         return runner.invoke(calculate, list(args)) 
 
     def test_cli_add_integration(self): 
@@ -37,6 +39,7 @@ class TestCLIIntegration:
         """Test CLI can perform division"""
         res = self.run_cli('divide', '15', '3')
         assert res.exit_code == 0
+        # Assuming your CLI formats 15/3 to a whole number if possible, else 2 decimal places
         assert res.output.strip() == '5'
 
     def test_cli_sqrt_integration(self):
@@ -49,7 +52,7 @@ class TestCLIIntegration:
         """Test CLI properly handles calculator errors (e.g., division by zero)"""
         res = self.run_cli('divide', '10', '0')
         assert res.exit_code == 1
-        # CliRunner captures all output in .output, even if directed to stderr by click.echo(err=True)
+        # CliRunner captures the click.echo(err=True) output in .output as well
         assert 'Cannot divide by zero' in res.output 
 
     def test_cli_invalid_operation_integration(self):
@@ -57,8 +60,6 @@ class TestCLIIntegration:
         res = self.run_cli('invalid', '1', '2')
         assert res.exit_code == 1
         assert 'Unknown operation' in res.output
-
-# --- Module-level integration tests (kept for completeness) ---
 
 class TestCalculatorModuleIntegration:
     """Test calculator module functions work together"""

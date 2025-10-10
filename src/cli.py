@@ -1,21 +1,15 @@
 """CLI interface for calculator operations."""
 
-# In file: src/cli.py
-
-"""CLI interface for calculator operations."""
-
 import sys
 import os
 import click
 
-# 💥 CRITICAL FIX: Ensure the project root is on sys.path 
-# This helps pytest/CliRunner resolve imports like 'from src.calculator import...'
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# We remove the manual sys.path.append() here to rely on the PYTHONPATH set in ci.yml
+# This is cleaner and avoids conflicts when imported as a module by pytest.
 
 # Import the calculator functions
-from src.calculator import add, subtract, multiply, divide, power, square_root 
+from src.calculator import add, subtract, multiply, divide, power, square_root
 
-# ... the rest of your calculate function (@click.command, etc.) ...
 
 @click.command()
 @click.argument("operation")
@@ -24,7 +18,7 @@ from src.calculator import add, subtract, multiply, divide, power, square_root
 def calculate(operation, num1, num2=None):
     """Simple calculator CLI supporting add, subtract, multiply, divide, power, and square_root."""
     try:
-        # Check for missing operand early for two-argument operations (Page 114)
+        # Check for missing operand early for two-argument operations
         if operation in ("add", "subtract", "multiply", "divide", "power") and num2 is None:
             raise ValueError("Missing second operand")
 
@@ -39,7 +33,7 @@ def calculate(operation, num1, num2=None):
         elif operation == "power":
             result = power(num1, num2)
         elif operation == "square_root" or operation == "sqrt":
-            # square_root only needs num1 (Page 114)
+            # square_root only needs num1
             result = square_root(num1)
         else:
             click.echo(f"Unknown operation: {operation}")
@@ -47,17 +41,22 @@ def calculate(operation, num1, num2=None):
             
         # Format result cleanly to STDOUT for test verification
         if isinstance(result, (int, float)):
-            # Print without decimal if it's a whole number, otherwise print with 2 decimal places
+            # Use print for clean output capture by the test runner
             print(int(result) if result == int(result) else f"{result:.2f}")
         else:
             print(result)
 
     except ValueError as e:
-        # Handle specific expected errors (like division by zero, negative square root)
+        # Handle specific expected errors (like division by zero, missing operand)
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
         
     except Exception as e:
-        # Handle unexpected errors (Pylint flags this as W0718: broad-exception-caught)
+        # Handle unexpected errors
         click.echo(f"Unexpected error: {e}", err=True)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    # Suppress pylint error for 'no-value-for-parameter' as Click handles arguments
+    calculate()  # pylint: disable=no-value-for-parameter
